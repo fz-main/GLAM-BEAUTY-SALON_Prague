@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GLAM | Beauty Salon — Premium Hair, Nail & Aesthetics Studio Prague</title>
+<meta name="description" content="GLAM Beauty Salon — Premium Hair Styling, Nail Architecture & Advanced Facial Aesthetics in Prague." />
+
+<!-- Three.js r128 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- GSAP + ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #050507;
+    --off-white: #f2efe9;
+    --cream: #e8e0d0;
+    --gold: #c9a96e;
+    --gold-light: #e8d5a3;
+    --pink-glow: #ffb6c1;
+    --pink-deep: #c9647a;
+    --chrome: #d0d0d8;
+    --glass-bg: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.10);
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html {
+    scroll-behavior: auto;
+    overflow-x: hidden;
+    background: var(--black);
+    color: var(--off-white);
+    font-family: var(--font-body);
+  }
+
+  body {
+    overflow-x: hidden;
+    background: var(--black);
+  }
+
+  /* ── CANVAS CONTAINER ─────────────────────────── */
+  #canvas-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── PARTICLE CANVAS ──────────────────────────── */
+  #particle-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  /* ── NAVBAR ───────────────────────────────────── */
+  #navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.4rem 3rem;
+    background: rgba(5,5,7,0.55);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border-bottom: 1px solid var(--glass-border);
+    transition: background 0.4s ease;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    letter-spacing: 0.22em;
+    color: var(--off-white);
+    text-decoration: none;
+    line-height: 1;
+  }
+  .nav-logo span {
+    color: var(--gold);
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .lang-switcher {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .lang-btn {
+    background: none;
+    border: 1px solid var(--glass-border);
+    color: var(--chrome);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    padding: 0.35rem 0.65rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+  }
+  .lang-btn:hover, .lang-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--black);
+  }
+
+  .nav-cta {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    color: var(--black);
+    background: var(--gold);
+    padding: 0.55rem 1.4rem;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.25s ease, color 0.25s ease;
+    display: inline-block;
+  }
+  .nav-cta:hover {
+    background: var(--gold-light);
+    color: var(--black);
+  }
+
+  /* ── SECTIONS ─────────────────────────────────── */
+  section {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* ── HERO ─────────────────────────────────────── */
+  #hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 2rem;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.38em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 13vw, 13rem);
+    letter-spacing: 0.06em;
+    line-height: 0.92;
+    color: var(--off-white);
+    margin-bottom: 0.4rem;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-serif);
+    font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--cream);
+    letter-spacing: 0.06em;
+    margin-bottom: 3rem;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    opacity: 0;
+  }
+  .hero-scroll-hint span {
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.15); }
+  }
+
+  /* ── MARQUEE ──────────────────────────────────── */
+  #marquee-band {
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+    background: var(--gold);
+    padding: 0.85rem 0;
+    display: flex;
+  }
+
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marqueeScroll 22s linear infinite;
+  }
+
+  .marquee-track span {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.25em;
+    color: var(--black);
+    padding: 0 2.5rem;
+  }
+  .marquee-track span.sep {
+    color: var(--black);
+    opacity: 0.45;
+  }
+
+  @keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ── INTRO TEXT SECTION ───────────────────────── */
+  #intro {
+    padding: 12rem 10vw;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    align-items: center;
+  }
+
+  .intro-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .intro-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 4vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.18;
+    color: var(--off-white);
+    margin-bottom: 2rem;
+  }
+
+  .intro-body {
+    font-size: 0.95rem;
+    line-height: 1.85;
+    color: var(--chrome);
+    font-weight: 300;
+  }
+
+  .intro-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    margin-top: 1rem;
+  }
+
+  .stat-block {
+    border-left: 1px solid var(--gold);
+    padding-left: 1.4rem;
+  }
+
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 3.2rem;
+    letter-spacing: 0.04em;
+    color: var(--off-white);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+  }
+
+  /* ── SERVICES ─────────────────────────────────── */
+  #services {
+    padding: 8rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .services-header {
+    text-align: center;
+    padding: 0 2rem;
+    margin-bottom: 5rem;
+  }
+
+  .services-eyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.38em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  .services-title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    letter-spacing: 0.06em;
+    color: var(--off-white);
+    line-height: 1;
+  }
+
+  /* Bento grid */
+  #bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    gap: 1.2rem;
+    padding: 0 3rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    will-change: transform;
+  }
+
+  .bento-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    padding: 2.8rem;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: border-color 0.4s ease;
+    will-change: transform;
+    transform-style: preserve-3d;
+  }
+
+  .bento-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,169,110,0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .bento-card:hover::before { opacity: 1; }
+  .bento-card:hover { border-color: rgba(201,169,110,0.35); }
+
+  .bento-card.card-1 { grid-column: 1 / 6; grid-row: 1; min-height: 380px; }
+  .bento-card.card-2 { grid-column: 6 / 9; grid-row: 1; min-height: 380px; }
+  .bento-card.card-3 { grid-column: 9 / 13; grid-row: 1; min-height: 380px; }
+  .bento-card.card-4 { grid-column: 1 / 5; grid-row: 2; min-height: 280px; }
+  .bento-card.card-5 { grid-column: 5 / 9; grid-row: 2; min-height: 280px; }
+  .bento-card.card-6 { grid-column: 9 / 13; grid-row: 2; min-height: 280px; }
+
+  .bento-num {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 2.5rem;
+    display: block;
+  }
+
+  .bento-icon {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .bento-title {
+    font-family: var(--font-serif);
+    font-size: 1.7rem;
+    font-weight: 400;
+    color: var(--off-white);
+    line-height: 1.2;
+    margin-bottom: 1.2rem;
+  }
+
+  .bento-desc {
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--chrome);
+    font-weight: 300;
+    filter: blur(4px);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: filter 0.6s ease, opacity 0.6s ease, transform 0.5s ease;
+  }
+
+  .bento-card:hover .bento-desc {
+    filter: blur(0px);
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .bento-tag {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    border: 1px solid rgba(201,169,110,0.3);
+    padding: 0.3rem 0.7rem;
+  }
+
+  .bento-price {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+    margin-top: 1.5rem;
+    display: block;
+  }
+
+  /* diagonal data signals */
+  .data-signal {
+    position: fixed;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    color: var(--pink-glow);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50;
+    text-shadow: 0 0 12px var(--pink-glow);
+    white-space: nowrap;
+  }
+
+  /* ── SPECIALISTS ──────────────────────────────── */
+  #specialists {
+    padding: 10rem 6vw;
+  }
+
+  .specialists-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 5rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 2.5rem;
+  }
+
+  .specialists-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    letter-spacing: 0.06em;
+    color: var(--off-white);
+    line-height: 1;
+  }
+
+  .specialists-subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold);
+    max-width: 300px;
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .specialists-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .specialist-card {
+    border: 1px solid var(--glass-border);
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.4s ease;
+    background: var(--glass-bg);
+  }
+  .specialist-card:hover { border-color: rgba(201,169,110,0.4); }
+
+  .specialist-avatar {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(135deg, #0d0d12 0%, #1a1a22 40%, #100d0e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .specialist-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(to top, var(--black), transparent);
+  }
+
+  .specialist-body {
+    padding: 2rem 2rem 2.5rem;
+  }
+
+  .specialist-role {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .specialist-name {
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--off-white);
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+
+  .specialist-bio {
+    font-size: 0.83rem;
+    line-height: 1.8;
+    color: var(--chrome);
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+  }
+
+  .specialist-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .skill-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    border: 1px solid rgba(201,169,110,0.3);
+    padding: 0.25rem 0.6rem;
+    text-transform: uppercase;
+  }
+
+  /* ── MAP ──────────────────────────────────────── */
+  #location {
+    padding: 8rem 6vw;
+  }
+
+  .location-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .location-eyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.38em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .location-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 5rem);
+    letter-spacing: 0.06em;
+    color: var(--off-white);
+  }
+
+  .location-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .location-info {
+    padding-top: 1rem;
+  }
+
+  .location-info h3 {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--off-white);
+    margin-bottom: 1.2rem;
+  }
+
+  .location-detail {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+    color: var(--chrome);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .location-detail-icon {
+    color: var(--gold);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .hours-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 1.5rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .hours-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--chrome);
+    padding: 0.3rem 0;
+  }
+
+  .hours-row strong {
+    color: var(--off-white);
+    font-weight: 400;
+  }
+
+  .map-wrapper {
+    position: relative;
+    height: 480px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    filter: grayscale(1) invert(1) contrast(0.88) brightness(0.7) hue-rotate(180deg);
+  }
+
+  .map-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  .map-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ── FOOTER ───────────────────────────────────── */
+  footer {
+    background: #02020a;
+    border-top: 1px solid var(--glass-border);
+    padding: 6rem 6vw 3rem;
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 5rem;
+  }
+
+  .footer-brand-logo {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 0.2em;
+    color: var(--off-white);
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+
+  .footer-brand-logo span { color: var(--gold); }
+
+  .footer-tagline {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--chrome);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 280px;
+    font-weight: 300;
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .social-link {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--chrome);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    font-family: var(--font-body);
+    font-weight: 500;
+  }
+
+  .social-link:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--black);
+  }
+
+  .footer-col-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.8rem;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .footer-col ul li a {
+    font-size: 0.85rem;
+    color: var(--chrome);
+    text-decoration: none;
+    font-weight: 300;
+    transition: color 0.2s ease;
+    letter-spacing: 0.04em;
+  }
+
+  .footer-col ul li a:hover { color: var(--gold); }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--glass-border);
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── NOISE OVERLAY ────────────────────────────── */
+  #noise {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* ── SCROLL PROGRESS ──────────────────────────── */
+  #scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold), var(--pink-glow));
+    z-index: 999;
+    transition: width 0.1s linear;
+  }
+
+  /* ── BOOKING MODAL ────────────────────────────── */
+  #booking-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5,5,7,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  #booking-modal.open { display: flex; }
+
+  .modal-box {
+    background: #0a0a12;
+    border: 1px solid var(--glass-border);
+    padding: 3.5rem;
+    max-width: 520px;
+    width: 90%;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--chrome);
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    letter-spacing: 0.1em;
+    color: var(--off-white);
+    margin-bottom: 0.5rem;
+  }
+
+  .modal-sub {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--gold);
+    margin-bottom: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .modal-field {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    color: var(--off-white);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .modal-field:focus { border-color: var(--gold); }
+
+  .modal-submit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--gold);
+    border: none;
+    color: var(--black);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s ease;
+    margin-top: 0.5rem;
+  }
+
+  .modal-submit:hover { background: var(--gold-light); }
+
+  /* ── ANIMATE ON SCROLL ────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ───────────────────────────────── */
+  @media (max-width: 1100px) {
+    #bento-grid {
+      grid-template-columns: 1fr 1fr;
+      padding: 0 1.5rem;
+    }
+    .bento-card.card-1,
+    .bento-card.card-2,
+    .bento-card.card-3,
+    .bento-card.card-4,
+    .bento-card.card-5,
+    .bento-card.card-6 {
+      grid-column: auto;
+      grid-row: auto;
+      min-height: 280px;
+    }
+    .specialists-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    #intro { grid-template-columns: 1fr; gap: 4rem; padding: 7rem 8vw; }
+  }
+
+  @media (max-width: 768px) {
+    #navbar { padding: 1.2rem 1.5rem; }
+    .nav-cta { display: none; }
+    #bento-grid { grid-template-columns: 1fr; }
+    .specialists-grid { grid-template-columns: 1fr; }
+    .location-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .specialists-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .specialists-subtitle { text-align: left; }
+  }
+</style>
+</head>
+
+<body>
+<!-- Noise overlay -->
+<div id="noise" aria-hidden="true"></div>
+
+<!-- Scroll progress bar -->
+<div id="scroll-progress" aria-hidden="true"></div>
+
+<!-- WebGL canvas -->
+<div id="canvas-container" aria-hidden="true"></div>
+
+<!-- Particle canvas overlay -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- Data signals -->
+<div class="data-signal" id="sig1">GLAM HAIR</div>
+<div class="data-signal" id="sig2">MANICURE</div>
+<div class="data-signal" id="sig3">GLOW SKIN</div>
+<div class="data-signal" id="sig4">GLAM_SALON PRAGUE</div>
+<div class="data-signal" id="sig5">BEAUTY</div>
+<div class="data-signal" id="sig6">LUXURY</div>
+
+<!-- ── NAVBAR ── -->
+<nav id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="#" class="nav-logo">GLAM <span>|</span> BEAUTY</a>
+  <div class="nav-right">
+    <div class="lang-switcher" role="group" aria-label="Language switcher">
+      <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+      <button class="lang-btn" data-lang="cz" aria-pressed="false">CZ</button>
+      <button class="lang-btn" data-lang="ru" aria-pressed="false">RU</button>
+    </div>
+    <a href="#" class="nav-cta" id="nav-book-btn" data-i18n="book">Book Now</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero" aria-label="Hero">
+  <p class="hero-eyebrow" data-i18n="hero_eyebrow">Prague's Premier Beauty Studio</p>
+  <h1 class="hero-title">GLAM</h1>
+  <p class="hero-subtitle" data-i18n="hero_sub">Premium Hair · Nail Architecture · Facial Aesthetics</p>
+  <div class="hero-scroll-hint" aria-hidden="true">
+    <span data-i18n="scroll">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ── MARQUEE ── -->
+<div id="marquee-band" aria-hidden="true">
+  <div class="marquee-track">
+    <span>GLAM BEAUTY SALON</span><span class="sep">◆</span>
+    <span>PRAGUE</span><span class="sep">◆</span>
+    <span>PREMIUM HAIR STYLING</span><span class="sep">◆</span>
+    <span>NAIL ARCHITECTURE</span><span class="sep">◆</span>
+    <span>FACIAL AESTHETICS</span><span class="sep">◆</span>
+    <span>LUXURY STUDIO</span><span class="sep">◆</span>
+    <span>SINCE 2014</span><span class="sep">◆</span>
+    <span>GLAM BEAUTY SALON</span><span class="sep">◆</span>
+    <span>PRAGUE</span><span class="sep">◆</span>
+    <span>PREMIUM HAIR STYLING</span><span class="sep">◆</span>
+    <span>NAIL ARCHITECTURE</span><span class="sep">◆</span>
+    <span>FACIAL AESTHETICS</span><span class="sep">◆</span>
+    <span>LUXURY STUDIO</span><span class="sep">◆</span>
+    <span>SINCE 2014</span><span class="sep">◆</span>
+  </div>
+</div>
+
+<!-- ── INTRO ── -->
+<section id="intro">
+  <div class="reveal">
+    <p class="intro-label" data-i18n="about_label">About the Studio</p>
+    <h2 class="intro-heading" data-i18n="about_heading">Where Beauty Becomes <em>Architecture</em></h2>
+    <p class="intro-body" data-i18n="about_body">
+      Nestled in the heart of Prague, GLAM is a sanctuary of refined aesthetics. We don't merely style hair or paint nails — we craft experiences, identities, and confidence. Every treatment is a collaboration between artistry and science, delivered by masters of their craft in a space designed to inspire.
+    </p>
+  </div>
+  <div class="intro-stat-grid reveal" style="transition-delay:0.18s">
+    <div class="stat-block">
+      <div class="stat-num">10+</div>
+      <div class="stat-label" data-i18n="stat1">Years of Excellence</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num">4800+</div>
+      <div class="stat-label" data-i18n="stat2">Happy Clients</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num">28</div>
+      <div class="stat-label" data-i18n="stat3">Expert Specialists</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num">5★</div>
+      <div class="stat-label" data-i18n="stat4">Google Rating</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section id="services">
+  <div class="services-header">
+    <p class="services-eyebrow reveal" data-i18n="services_label">Our Expertise</p>
+    <h2 class="services-title reveal" data-i18n="services_title">SERVICES</h2>
+  </div>
+
+  <div id="bento-grid">
+    <!-- Card 1 -->
+    <div class="bento-card card-1">
+      <span class="bento-num">01</span>
+      <span class="bento-icon">✦</span>
+      <h3 class="bento-title" data-i18n="svc1_title">Premium Hair Styling & Colour</h3>
+      <p class="bento-desc" data-i18n="svc1_desc">From Balayage to precision cuts, our master colourists translate the latest European trends into your personal signature. Each session begins with a full consultation and ends with a bespoke styling lesson tailored to your hair texture and lifestyle.</p>
+      <span class="bento-price">from 890 CZK</span>
+      <span class="bento-tag" data-i18n="book_tag">Book Session</span>
+    </div>
+    <!-- Card 2 -->
+    <div class="bento-card card-2">
+      <span class="bento-num">02</span>
+      <span class="bento-icon">◈</span>
+      <h3 class="bento-title" data-i18n="svc2_title">Bespoke Nail Architecture</h3>
+      <p class="bento-desc" data-i18n="svc2_desc">We treat nails as miniature canvases. Gel overlays, sculptured acrylics, nail art, and advanced nail health treatments — all performed with medical-grade tools in a hygienic, luxurious setting.</p>
+      <span class="bento-price">from 650 CZK</span>
+      <span class="bento-tag" data-i18n="book_tag">Book Session</span>
+    </div>
+    <!-- Card 3 -->
+    <div class="bento-card card-3">
+      <span class="bento-num">03</span>
+      <span class="bento-icon">❋</span>
+      <h3 class="bento-title" data-i18n="svc3_title">Advanced Facial Aesthetics</h3>
+      <p class="bento-desc" data-i18n="svc3_desc">Clinically proven protocols including microneedling, LED phototherapy, hyaluronic acid infusions, and custom enzyme peels. Designed to deliver visible, lasting results that align with your skin's biology.</p>
+      <span class="bento-price">from 1 290 CZK</span>
+      <span class="bento-tag" data-i18n="book_tag">Book Session</span>
+    </div>
+    <!-- Card 4 -->
+    <div class="bento-card card-4">
+      <span class="bento-num">04</span>
+      <span class="bento-icon">◇</span>
+      <h3 class="bento-title" data-i18n="svc4_title">Bridal & Event Styling</h3>
+      <p class="bento-desc" data-i18n="svc4_desc">Full-day bridal packages, editorial shoots, and gala preparations. Our team travels to your venue. Unlimited trials included in every premium bridal booking.</p>
+      <span class="bento-price">from 3 500 CZK</span>
+      <span class="bento-tag" data-i18n="book_tag">Enquire</span>
+    </div>
+    <!-- Card 5 -->
+    <div class="bento-card card-5">
+      <span class="bento-num">05</span>
+      <span class="bento-icon">✧</span>
+      <h3 class="bento-title" data-i18n="svc5_title">Lash & Brow Artistry</h3>
+      <p class="bento-desc" data-i18n="svc5_desc">Volume lash extensions, Keratin brow lamination, microblading, and powder brows by certified beauticians. Perfectly framing your natural features for a polished look that lasts weeks.</p>
+      <span class="bento-price">from 780 CZK</span>
+      <span class="bento-tag" data-i18n="book_tag">Book Session</span>
+    </div>
+    <!-- Card 6 -->
+    <div class="bento-card card-6">
+      <span class="bento-num">06</span>
+      <span class="bento-icon">⬡</span>
+      <h3 class="bento-title" data-i18n="svc6_title">Luxury Spa Rituals</h3>
+      <p class="bento-desc" data-i18n="svc6_desc">Scalp rejuvenation, aromatherapy body treatments, and deep-tissue massage paired with our signature GLAM glow facial. The ultimate afternoon of total renewal for mind and body.</p>
+      <span class="bento-price">from 2 100 CZK</span>
+      <span class="bento-tag" data-i18n="book_tag">Book Package</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── SPECIALISTS ── -->
+<section id="specialists">
+  <div class="specialists-header">
+    <h2 class="specialists-title reveal" data-i18n="team_title">OUR MASTERS</h2>
+    <p class="specialists-subtitle reveal" data-i18n="team_sub">Every specialist is a craftsperson trained in the finest European academies.</p>
+  </div>
+  <div class="specialists-grid">
+    <!-- Specialist 1 -->
+    <div class="specialist-card reveal">
+      <div class="specialist-avatar">🌿</div>
+      <div class="specialist-body">
+        <p class="specialist-role" data-i18n="role1">Head Hair Stylist & Colourist</p>
+        <h3 class="specialist-name">Karolína Novotná</h3>
+        <p class="specialist-bio" data-i18n="bio1">With 12 years of experience and training at Vidal Sassoon Academy London, Karolína is the creative director behind GLAM's aesthetic identity. Her colour philosophy blends organic pigment science with bold artistic expression.</p>
+        <div class="specialist-skills">
+          <span class="skill-tag">Balayage</span>
+          <span class="skill-tag">Precision Cut</span>
+          <span class="skill-tag">Creative Colour</span>
+          <span class="skill-tag">Hair Botox</span>
+        </div>
+      </div>
+    </div>
+    <!-- Specialist 2 -->
+    <div class="specialist-card reveal" style="transition-delay:0.12s">
+      <div class="specialist-avatar">💎</div>
+      <div class="specialist-body">
+        <p class="specialist-role" data-i18n="role2">Nail Architecture Lead</p>
+        <h3 class="specialist-name">Tereza Horáčková</h3>
+        <p class="specialist-bio" data-i18n="bio2">Czech champion in nail design (2021, 2022). Tereza's sculptural approach to nail artistry has been featured in Vogue CS and Harper's Bazaar CZ. She specialises in structural gel systems and fine-art nail painting.</p>
+        <div class="specialist-skills">
+          <span class="skill-tag">Gel Sculpture</span>
+          <span class="skill-tag">Nail Art</span>
+          <span class="skill-tag">Polygel</span>
+          <span class="skill-tag">Nail Health</span>
+        </div>
+      </div>
+    </div>
+    <!-- Specialist 3 -->
+    <div class="specialist-card reveal" style="transition-delay:0.24s">
+      <div class="specialist-avatar">✨</div>
+      <div class="specialist-body">
+        <p class="specialist-role" data-i18n="role3">Senior Aesthetic Therapist</p>
+        <h3 class="specialist-name">Soňa Blahová</h3>
+        <p class="specialist-bio" data-i18n="bio3">Certified in advanced dermatological protocols across three European institutions, Soňa brings a clinical precision to every facial treatment. She is GLAM's lead specialist in skin rejuvenation and anti-aging therapies.</p>
+        <div class="specialist-skills">
+          <span class="skill-tag">Microneedling</span>
+          <span class="skill-tag">LED Therapy</span>
+          <span class="skill-tag">Chemical Peels</span>
+          <span class="skill-tag">HA Infusion</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LOCATION ── -->
+<section id="location">
+  <div class="location-header reveal">
+    <p class="location-eyebrow" data-i18n="location_label">Find Us</p>
+    <h2 class="location-title" data-i18n="location_title">PRAGUE STUDIO</h2>
+  </div>
+  <div class="location-grid">
+    <div class="location-info reveal">
+      <h3 data-i18n="address_title">GLAM Beauty Salon</h3>
+      <div class="location-detail">
+        <span class="location-detail-icon">◆</span>
+        <span data-i18n="address">Pařížská 12, 110 00 Praha 1, Czech Republic</span>
+      </div>
+      <div class="location-detail">
+        <span class="location-detail-icon">◆</span>
+        <a href="tel:+420123456789" style="color:var(--chrome);text-decoration:none">+420 123 456 789</a>
+      </div>
+      <div class="location-detail">
+        <span class="location-detail-icon">◆</span>
+        <a href="mailto:hello@glamprague.cz" style="color:var(--chrome);text-decoration:none">hello@glamprague.cz</a>
+      </div>
+      <div class="hours-grid">
+        <div class="hours-row"><strong data-i18n="mon_fri">Mon – Fri</strong><span>9:00 – 20:00</span></div>
+        <div class="hours-row"><strong data-i18n="saturday">Saturday</strong><span>10:00 – 18:00</span></div>
+        <div class="hours-row"><strong data-i18n="sunday">Sunday</strong><span data-i18n="closed">Closed</span></div>
+        <div class="hours-row"><strong data-i18n="holidays">Holidays</strong><span data-i18n="by_appt">By appt.</span></div>
+      </div>
+    </div>
+    <div class="map-wrapper reveal" style="transition-delay:0.15s">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2559.7786059!2d14.4184!3d50.0923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470b94e97f5d5a0b%3A0x6a4e4a39e978d2e5!2sPA%C5%98%C3%8D%C5%BDSK%C3%81%2C%20110%2000%20Josefov%2C%20Czech%20Republic!5e0!3m2!1sen!2sus!4v1680000000000!5m2!1sen!2sus"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="GLAM Beauty Salon Location"
+        aria-label="Google Maps showing GLAM Beauty Salon location in Prague">
+      </iframe>
+      <div class="map-overlay"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <span class="footer-brand-logo">GLAM <span>|</span> BEAUTY</span>
+      <p class="footer-tagline" data-i18n="footer_tagline">
+        Prague's sanctuary of refined beauty, where artistry and science craft your most luminous self.
+      </p>
+      <div class="footer-social">
+        <a class="social-link" href="#" aria-label="Instagram">IG</a>
+        <a class="social-link" href="#" aria-label="Facebook">FB</a>
+        <a class="social-link" href="#" aria-label="TikTok">TK</a>
+        <a class="social-link" href="#" aria-label="Pinterest">PT</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title" data-i18n="footer_services">Services</p>
+      <ul>
+        <li><a href="#services" data-i18n="fc_hair">Hair Styling</a></li>
+        <li><a href="#services" data-i18n="fc_nail">Nail Architecture</a></li>
+        <li><a href="#services" data-i18n="fc_skin">Facial Aesthetics</a></li>
+        <li><a href="#services" data-i18n="fc_bridal">Bridal Packages</a></li>
+        <li><a href="#services" data-i18n="fc_spa">Spa Rituals</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title" data-i18n="footer_studio">Studio</p>
+      <ul>
+        <li><a href="#specialists" data-i18n="fc_team">Our Team</a></li>
+        <li><a href="#location" data-i18n="fc_find">Find Us</a></li>
+        <li><a href="#" data-i18n="fc_gift">Gift Cards</a></li>
+        <li><a href="#" data-i18n="fc_membership">Membership</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title" data-i18n="footer_legal">Legal</p>
+      <ul>
+        <li><a href="#" data-i18n="fc_privacy">Privacy Policy</a></li>
+        <li><a href="#" data-i18n="fc_terms">Terms of Service</a></li>
+        <li><a href="#" data-i18n="fc_gdpr">GDPR</a></li>
+        <li><a href="#" data-i18n="fc_cookies">Cookies</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 GLAM Beauty Salon s.r.o. All rights reserved.</span>
+    <span data-i18n="footer_tagline2">Crafted with precision in Prague.</span>
+  </div>
+</footer>
+
+<!-- ── BOOKING MODAL ── -->
+<div id="booking-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-el">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close-btn" aria-label="Close">✕</button>
+    <h2 class="modal-title" id="modal-title-el" data-i18n="modal_title">BOOK NOW</h2>
+    <p class="modal-sub" data-i18n="modal_sub">Reserve your GLAM experience</p>
+    <input class="modal-field" type="text" data-i18n-placeholder="modal_name" placeholder="Your Name" aria-label="Your Name" />
+    <input class="modal-field" type="email" data-i18n-placeholder="modal_email" placeholder="Email Address" aria-label="Email Address" />
+    <input class="modal-field" type="tel" data-i18n-placeholder="modal_tel" placeholder="Phone Number" aria-label="Phone Number" />
+    <select class="modal-field" aria-label="Service">
+      <option value="" data-i18n="modal_select">Select Service</option>
+      <option data-i18n="svc1_title">Premium Hair Styling & Colour</option>
+      <option data-i18n="svc2_title">Bespoke Nail Architecture</option>
+      <option data-i18n="svc3_title">Advanced Facial Aesthetics</option>
+      <option data-i18n="svc4_title">Bridal & Event Styling</option>
+      <option data-i18n="svc5_title">Lash & Brow Artistry</option>
+      <option data-i18n="svc6_title">Luxury Spa Rituals</option>
+    </select>
+    <input class="modal-field" type="date" aria-label="Preferred Date" />
+    <button class="modal-submit" data-i18n="modal_submit">Confirm Booking</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+<script>
+/* ────────────────────────────────────────────────
+   I18N DICTIONARY
+──────────────────────────────────────────────── */
+const i18n = {
+  en: {
+    book: "Book Now",
+    hero_eyebrow: "Prague's Premier Beauty Studio",
+    hero_sub: "Premium Hair · Nail Architecture · Facial Aesthetics",
+    scroll: "Scroll",
+    about_label: "About the Studio",
+    about_heading: "Where Beauty Becomes Architecture",
+    about_body: "Nestled in the heart of Prague, GLAM is a sanctuary of refined aesthetics. We don't merely style hair or paint nails — we craft experiences, identities, and confidence. Every treatment is a collaboration between artistry and science, delivered by masters of their craft in a space designed to inspire.",
+    stat1: "Years of Excellence",
+    stat2: "Happy Clients",
+    stat3: "Expert Specialists",
+    stat4: "Google Rating",
+    services_label: "Our Expertise",
+    services_title: "SERVICES",
+    svc1_title: "Premium Hair Styling & Colour",
+    svc1_desc: "From Balayage to precision cuts, our master colourists translate the latest European trends into your personal signature.",
+    svc2_title: "Bespoke Nail Architecture",
+    svc2_desc: "We treat nails as miniature canvases. Gel overlays, sculptured acrylics, nail art, and advanced nail health treatments.",
+    svc3_title: "Advanced Facial Aesthetics",
+    svc3_desc: "Clinically proven protocols including microneedling, LED phototherapy, hyaluronic acid infusions, and custom enzyme peels.",
+    svc4_title: "Bridal & Event Styling",
+    svc4_desc: "Full-day bridal packages, editorial shoots, and gala preparations. Our team travels to your venue.",
+    svc5_title: "Lash & Brow Artistry",
+    svc5_desc: "Volume lash extensions, Keratin brow lamination, microblading, and powder brows by certified beauticians.",
+    svc6_title: "Luxury Spa Rituals",
+    svc6_desc: "Scalp rejuvenation, aromatherapy body treatments, and deep-tissue massage paired with our signature GLAM glow facial.",
+    book_tag: "Book Session",
+    team_title: "OUR MASTERS",
+    team_sub: "Every specialist is a craftsperson trained in the finest European academies.",
+    role1: "Head Hair Stylist & Colourist",
+    bio1: "With 12 years of experience and training at Vidal Sassoon Academy London, Karolína is the creative director behind GLAM's aesthetic identity.",
+    role2: "Nail Architecture Lead",
+    bio2: "Czech champion in nail design (2021, 2022). Tereza's sculptural approach has been featured in Vogue CS and Harper's Bazaar CZ.",
+    role3: "Senior Aesthetic Therapist",
+    bio3: "Certified in advanced dermatological protocols across three European institutions, Soňa brings clinical precision to every facial treatment.",
+    location_label: "Find Us",
+    location_title: "PRAGUE STUDIO",
+    address_title: "GLAM Beauty Salon",
+    address: "Pařížská 12, 110 00 Praha 1, Czech Republic",
+    mon_fri: "Mon – Fri",
+    saturday: "Saturday",
+    sunday: "Sunday",
+    closed: "Closed",
+    holidays: "Holidays",
+    by_appt: "By appt.",
+    footer_services: "Services",
+    footer_studio: "Studio",
+    footer_legal: "Legal",
+    footer_tagline: "Prague's sanctuary of refined beauty, where artistry and science craft your most luminous self.",
+    footer_tagline2: "Crafted with precision in Prague.",
+    fc_hair: "Hair Styling",
+    fc_nail: "Nail Architecture",
+    fc_skin: "Facial Aesthetics",
+    fc_bridal: "Bridal Packages",
+    fc_spa: "Spa Rituals",
+    fc_team: "Our Team",
+    fc_find: "Find Us",
+    fc_gift: "Gift Cards",
+    fc_membership: "Membership",
+    fc_privacy: "Privacy Policy",
+    fc_terms: "Terms of Service",
+    fc_gdpr: "GDPR",
+    fc_cookies: "Cookies",
+    modal_title: "BOOK NOW",
+    modal_sub: "Reserve your GLAM experience",
+    modal_name: "Your Name",
+    modal_email: "Email Address",
+    modal_tel: "Phone Number",
+    modal_select: "Select Service",
+    modal_submit: "Confirm Booking"
+  },
+  cz: {
+    book: "Rezervovat",
+    hero_eyebrow: "Přední pražský beauty studio",
+    hero_sub: "Prémiové vlasy · Architektura nehtů · Estetika obličeje",
+    scroll: "Scroll",
+    about_label: "O studiu",
+    about_heading: "Kde se krása stává architekturou",
+    about_body: "Uprostřed Prahy je GLAM svatyní zjemnělé estetiky. Nestylizujeme jen vlasy ani nelakujeme nehty — tvoříme zážitky, identity a sebedůvěru. Každé ošetření je spoluprací umění a vědy.",
+    stat1: "Roků excelence",
+    stat2: "Spokojených klientů",
+    stat3: "Odborných specialistů",
+    stat4: "Hodnocení Google",
+    services_label: "Naše expertíza",
+    services_title: "SLUŽBY",
+    svc1_title: "Prémiový styling a barvení vlasů",
+    svc1_desc: "Od Balayage po precizní střihy — naši mistři translují nejnovější evropské trendy do vaší osobní signatury.",
+    svc2_title: "Architektura nehtů na zakázku",
+    svc2_desc: "Nehty jako miniaturní plátna. Gelové překryvy, akrylové sochy, nail art a péče o zdraví nehtů.",
+    svc3_title: "Pokročilá estetika obličeje",
+    svc3_desc: "Klinicky ověřené protokoly: mikrojehličkování, LED fototerapie, kyselina hyaluronová a enzymatické peelingy.",
+    svc4_title: "Svatební & event styling",
+    svc4_desc: "Celodenní svatební balíčky, editorial focení a přípravy na gala akce. Náš tým přijede k vám.",
+    svc5_title: "Řasy & obočí umění",
+    svc5_desc: "Objemové prodlužování řas, keratin laminace obočí, microblading a prášková obočí.",
+    svc6_title: "Luxusní spa rituály",
+    svc6_desc: "Omlazení pokožky hlavy, aromaterapie, hluboká masáž a naše signature GLAM glow ošetření.",
+    book_tag: "Rezervovat",
+    team_title: "NAŠI MISTŘI",
+    team_sub: "Každý specialista je řemeslník vyškolený na nejlepších evropských akademiích.",
+    role1: "Hlavní kadeřnice & koloristka",
+    bio1: "S 12 lety zkušeností a školením ve Vidal Sassoon Academy London je Karolína kreativní ředitelkou estetické identity GLAM.",
+    role2: "Vedoucí architektury nehtů",
+    bio2: "Česká mistryně v nail designu (2021, 2022). Práce Terezy se objevily ve Vogue CS a Harper's Bazaar CZ.",
+    role3: "Senior estetický terapeut",
+    bio3: "Certifikovaná v pokročilých dermatologických protokolech na třech evropských institucích.",
+    location_label: "Najděte nás",
+    location_title: "PRAŽSKÉ STUDIO",
+    address_title: "GLAM Beauty Salon",
+    address: "Pařížská 12, 110 00 Praha 1, Česká republika",
+    mon_fri: "Po – Pá",
+    saturday: "Sobota",
+    sunday: "Neděle",
+    closed: "Zavřeno",
+    holidays: "Svátky",
+    by_appt: "Po dohodě",
+    footer_services: "Služby",
+    footer_studio: "Studio",
+    footer_legal: "Právní",
+    footer_tagline: "Pražská svatyně zjemnělé krásy, kde umění a věda tvoří vaše nejluminóznější já.",
+    footer_tagline2: "Vytvořeno s precizností v Praze.",
+    fc_hair: "Vlasový styling",
+    fc_nail: "Architektura nehtů",
+    fc_skin: "Estetika obličeje",
+    fc_bridal: "Svatební balíčky",
+    fc_spa: "Spa rituály",
+    fc_team: "Náš tým",
+    fc_find: "Najděte nás",
+    fc_gift: "Dárkové karty",
+    fc_membership: "Členství",
+    fc_privacy: "Ochrana soukromí",
+    fc_terms: "Podmínky služby",
+    fc_gdpr: "GDPR",
+    fc_cookies: "Cookies",
+    modal_title: "REZERVOVAT",
+    modal_sub: "Rezervujte si svůj GLAM zážitek",
+    modal_name: "Vaše jméno",
+    modal_email: "E-mailová adresa",
+    modal_tel: "Telefonní číslo",
+    modal_select: "Vyberte službu",
+    modal_submit: "Potvrdit rezervaci"
+  },
+  ru: {
+    book: "Забронировать",
+    hero_eyebrow: "Премиальная студия красоты в Праге",
+    hero_sub: "Волосы · Ногтевая архитектура · Эстетика лица",
+    scroll: "Прокрутить",
+    about_label: "О студии",
+    about_heading: "Где красота становится архитектурой",
+    about_body: "Расположенный в сердце Праги, GLAM — это sanctuary утончённой эстетики. Мы не просто укладываем волосы — мы создаём опыт, идентичность и уверенность.",
+    stat1: "Лет совершенства",
+    stat2: "Довольных клиентов",
+    stat3: "Специалистов экспертов",
+    stat4: "Рейтинг Google",
+    services_label: "Наша экспертиза",
+    services_title: "УСЛУГИ",
+    svc1_title: "Премиальный стайлинг и окрашивание",
+    svc1_desc: "От Балаяж до точных стрижек — наши мастера-колористы воплощают последние европейские тренды в вашу личную подпись.",
+    svc2_title: "Индивидуальная ногтевая архитектура",
+    svc2_desc: "Мы относимся к ногтям как к миниатюрным холстам. Гелевые покрытия, акриловые скульптуры и арт-маникюр.",
+    svc3_title: "Продвинутая эстетика лица",
+    svc3_desc: "Клинически проверенные протоколы: микронидлинг, LED-фототерапия, инфузии гиалуроновой кислоты.",
+    svc4_title: "Свадебный & Event стайлинг",
+    svc4_desc: "Свадебные пакеты на весь день, съёмки и подготовка к гала-мероприятиям. Команда выезжает к вам.",
+    svc5_title: "Искусство ресниц & бровей",
+    svc5_desc: "Объёмное наращивание ресниц, ламинирование бровей, микроблейдинг и пудровые брови.",
+    svc6_title: "Люкс-спа ритуалы",
+    svc6_desc: "Омоложение кожи головы, ароматерапия, глубокий массаж и наш подписной GLAM glow уход.",
+    book_tag: "Забронировать",
+    team_title: "НАШИ МАСТЕРА",
+    team_sub: "Каждый специалист — мастер своего дела, прошедший обучение в лучших европейских академиях.",
+    role1: "Главный стилист & колорист",
+    bio1: "С 12-летним опытом и обучением в Vidal Sassoon Academy London, Каролина — творческий директор эстетической идентичности GLAM.",
+    role2: "Руководитель ногтевой архитектуры",
+    bio2: "Чемпион Чехии по nail-дизайну (2021, 2022). Работы Терезы представлены в Vogue CS и Harper's Bazaar CZ.",
+    role3: "Старший эстетический терапевт",
+    bio3: "Сертифицирована по продвинутым дерматологическим протоколам в трёх европейских учреждениях.",
+    location_label: "Найти нас",
+    location_title: "ПРАЖСКАЯ СТУДИЯ",
+    address_title: "GLAM Beauty Salon",
+    address: "Pařížská 12, 110 00 Praha 1, Чешская Республика",
+    mon_fri: "Пн – Пт",
+    saturday: "Суббота",
+    sunday: "Воскресенье",
+    closed: "Закрыто",
+    holidays: "Праздники",
+    by_appt: "По записи",
+    footer_services: "Услуги",
+    footer_studio: "Студия",
+    footer_legal: "Правовая",
+    footer_tagline: "Пражское место утончённой красоты, где искусство и наука создают ваш самый сияющий образ.",
+    footer_tagline2: "Создано с точностью в Праге.",
+    fc_hair: "Стайлинг волос",
+    fc_nail: "Ногтевая архитектура",
+    fc_skin: "Эстетика лица",
+    fc_bridal: "Свадебные пакеты",
+    fc_spa: "Спа-ритуалы",
+    fc_team: "Наша команда",
+    fc_find: "Найти нас",
+    fc_gift: "Подарочные карты",
+    fc_membership: "Членство",
+    fc_privacy: "Конфиденциальность",
+    fc_terms: "Условия использования",
+    fc_gdpr: "GDPR",
+    fc_cookies: "Куки",
+    modal_title: "ЗАБРОНИРОВАТЬ",
+    modal_sub: "Зарезервируйте свой GLAM опыт",
+    modal_name: "Ваше имя",
+    modal_email: "Адрес электронной почты",
+    modal_tel: "Номер телефона",
+    modal_select: "Выберите услугу",
+    modal_submit: "Подтвердить бронирование"
+  }
+};
+
+let currentLang = 'en';
+
+function applyLang(lang) {
+  currentLang = lang;
+  const dict = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.textContent = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (dict[key] !== undefined) el.placeholder = dict[key];
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+    btn.setAttribute('aria-pressed', btn.dataset.lang === lang ? 'true' : 'false');
+  });
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+/* ────────────────────────────────────────────────
+   SCROLL PROGRESS
+──────────────────────────────────────────────── */
+const scrollBar = document.getElementById('scroll-progress');
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  scrollBar.style.width = (window.scrollY / max * 100) + '%';
+}, { passive: true });
+
+/* ────────────────────────────────────────────────
+   BOOKING MODAL
+──────────────────────────────────────────────── */
+const modal = document.getElementById('booking-modal');
+const modalClose = document.getElementById('modal-close-btn');
+const navBook = document.getElementById('nav-book-btn');
+
+function openModal() { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal() { modal.classList.remove('open'); document.body.style.overflow = ''; }
+
+navBook.addEventListener('click', e => { e.preventDefault(); openModal(); });
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ────────────────────────────────────────────────
+   REVEAL ON SCROLL (IntersectionObserver)
+──────────────────────────────────────────────── */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ────────────────────────────────────────────────
+   THREE.JS SETUP
+──────────────────────────────────────────────── */
+(function initWebGL() {
+  const container = document.getElementById('canvas-container');
+
+  // Renderer
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
+  container.appendChild(renderer.domElement);
+
+  // Scene
+  const scene = new THREE.Scene();
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 4.6);
+
+  // Lights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+  scene.add(ambientLight);
+
+  const dirLight1 = new THREE.DirectionalLight(0xffffff, 5.5);
+  dirLight1.position.set(6, 6, 6);
+  scene.add(dirLight1);
+
+  const dirLight2 = new THREE.DirectionalLight(0xffb6c1, 4.0);
+  dirLight2.position.set(-6, -2, -4);
+  scene.add(dirLight2);
+
+  const dirLight3 = new THREE.DirectionalLight(0xc9a96e, 2.5);
+  dirLight3.position.set(0, -6, 4);
+  scene.add(dirLight3);
+
+  // Geometry — TorusKnot (r128 compatible)
+  const geometry = new THREE.TorusKnotGeometry(1.2, 0.32, 180, 24, 2, 3);
+
+  // Material — Mirror Chrome
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    metalness: 1.0,
+    roughness: 0.02
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(0, 0, 0);
+  scene.add(mesh);
+
+  // Mouse tracking for hero
+  let mouseX = 0, mouseY = 0;
+  let targetRotX = 0, targetRotY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  // Scroll-based state
+  let scrollProgress = 0;
+  let wireframeActive = false;
+  let knotVisible = true;
+
+  window.addEventListener('scroll', () => {
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    scrollProgress = window.scrollY / maxScroll;
+
+    const servicesEl = document.getElementById('services');
+    const servicesTop = servicesEl.offsetTop;
+    const servicesBot = servicesTop + servicesEl.offsetHeight;
+    const scrollY = window.scrollY + window.innerHeight * 0.5;
+
+    if (scrollY > servicesTop && scrollY < servicesBot) {
+      if (!wireframeActive) {
+        wireframeActive = true;
+        material.wireframe = true;
+        material.color.setHex(0xffb6c1);
+        material.roughness = 0.0;
+      }
+    } else {
+      if (wireframeActive) {
+        wireframeActive = false;
+        material.wireframe = false;
+        material.color.setHex(0xffffff);
+        material.roughness = 0.02;
+      }
+    }
+  }, { passive: true });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Animate
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // Fluid mouse rotation in hero
+    targetRotY = THREE.MathUtils.lerp(targetRotY, mouseX * 0.5, 0.05);
+    targetRotX = THREE.MathUtils.lerp(targetRotX, mouseY * 0.3, 0.05);
+
+    mesh.rotation.x = targetRotX + t * 0.12;
+    mesh.rotation.y = targetRotY + t * 0.18;
+    mesh.rotation.z = t * 0.06;
+
+    // Camera Z from scroll (cinematic zoom into mesh)
+    const targetZ = 4.6 - scrollProgress * 3.5;
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.015);
+
+    // Light color pulse
+    dirLight2.intensity = 4.0 + Math.sin(t * 1.5) * 0.8;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+})();
+
+/* ────────────────────────────────────────────────
+   PARTICLE CANVAS — DIAGONAL MATRIX FLOW
+──────────────────────────────────────────────── */
+(function initParticles() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initDots();
+  });
+
+  const NUM_DOTS = 2500;
+  const dots = [];
+
+  // Modes: 0 = ambient (off), 1 = diagonal flow, 2 = reassemble
+  let mode = 0;
+  let flowProgress = 0;
+
+  function initDots() {
+    dots.length = 0;
+    for (let i = 0; i < NUM_DOTS; i++) {
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        ox: 0, oy: 0,
+        vx: 0, vy: 0,
+        size: Math.random() * 1.2 + 0.3,
+        alpha: Math.random() * 0.5 + 0.1,
+        speed: Math.random() * 2.5 + 1.2,
+        color: Math.random() > 0.7 ? '#ffb6c1' : '#c9a96e'
+      });
+    }
+    // store origin
+    dots.forEach(d => { d.ox = d.x; d.oy = d.y; });
+  }
+
+  initDots();
+
+  // Scroll listener for particle activation
+  const servicesSection = document.getElementById('services');
+
+  function checkScroll() {
+    const rect = servicesSection.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.2;
+    const pastView = rect.bottom < 0;
+
+    if (inView && mode !== 1) {
+      mode = 1;
+      canvas.style.opacity = '1';
+    } else if (pastView && mode !== 2) {
+      mode = 2;
+    } else if (!inView && !pastView && mode !== 0) {
+      mode = 0;
+      canvas.style.opacity = '0';
+    }
+  }
+
+  window.addEventListener('scroll', checkScroll, { passive: true });
+
+  let animFrame;
+  function renderParticles() {
+    animFrame = requestAnimationFrame(renderParticles);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (mode === 0) return;
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    dots.forEach((d, i) => {
+      if (mode === 1) {
+        // Diagonal flow: up and right at 45 degrees
+        d.x += d.speed * 0.7;
+        d.y -= d.speed * 0.7;
+
+        // Wrap around
+        if (d.x > W + 50) { d.x = -50; d.y = Math.random() * H; }
+        if (d.y < -50) { d.y = H + 50; d.x = Math.random() * W; }
+
+        // Draw dot + trail line
+        ctx.save();
+        ctx.globalAlpha = d.alpha;
+        ctx.strokeStyle = d.color;
+        ctx.lineWidth = d.size * 0.6;
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = d.color;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x - d.speed * 5, d.y + d.speed * 5);
+        ctx.stroke();
+        ctx.restore();
+
+      } else if (mode === 2) {
+        // Reassemble back to origin
+        d.x += (d.ox - d.x) * 0.04;
+        d.y += (d.oy - d.y) * 0.04;
+
+        ctx.save();
+        ctx.globalAlpha = d.alpha * 0.6;
+        ctx.fillStyle = d.color;
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = d.color;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        const dx = d.x - d.ox, dy = d.y - d.oy;
+        if (Math.sqrt(dx*dx + dy*dy) < 2) {
+          mode = 0;
+          canvas.style.opacity = '0';
+        }
+      }
+    });
+  }
+
+  renderParticles();
+})();
+
+/* ────────────────────────────────────────────────
+   DATA SIGNALS — DIAGONAL TEXT ANIMATION
+──────────────────────────────────────────────── */
+(function initSignals() {
+  const signals = [
+    document.getElementById('sig1'),
+    document.getElementById('sig2'),
+    document.getElementById('sig3'),
+    document.getElementById('sig4'),
+    document.getElementById('sig5'),
+    document.getElementById('sig6')
+  ];
+
+  const positions = [
+    { x: '15vw', y: '80vh' },
+    { x: '55vw', y: '70vh' },
+    { x: '30vw', y: '60vh' },
+    { x: '70vw', y: '50vh' },
+    { x: '10vw', y: '55vh' },
+    { x: '85vw', y: '75vh' }
+  ];
+
+  const servicesEl = document.getElementById('services');
+
+  function animateSignal(el, delay) {
+    const startX = parseFloat(positions[signals.indexOf(el)].x);
+    const startY = parseFloat(positions[signals.indexOf(el)].y);
+
+    gsap.fromTo(el,
+      {
+        opacity: 0,
+        x: startX + 'vw',
+        y: startY + 'vh'
+      },
+      {
+        opacity: 0.85,
+        x: (startX + 35) + 'vw',
+        y: (startY - 35) + 'vh',
+        duration: 2.2,
+        delay: delay,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          gsap.to(el, { opacity: 0, duration: 0.4, onComplete: () => {
+            el.style.opacity = '0';
+            el.style.transform = '';
+          }});
+        }
+      }
+    );
+  }
+
+  // Trigger signals when services section is in view
+  let signalsFired = false;
+
+  const sigObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !signalsFired) {
+        signalsFired = true;
+        signals.forEach((el, i) => animateSignal(el, i * 0.4));
+        // Reset after all done
+        setTimeout(() => { signalsFired = false; }, 6000);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sigObserver.observe(servicesEl);
+})();
+
+/* ────────────────────────────────────────────────
+   BENTO CARD TILT
+──────────────────────────────────────────────── */
+document.querySelectorAll('.bento-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / rect.width;
+    const dy = (e.clientY - cy) / rect.height;
+    card.style.transform = `perspective(900px) rotateY(${dx * 10}deg) rotateX(${-dy * 10}deg) scale3d(1.015, 1.015, 1.015)`;
+  });
+
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) scale3d(1, 1, 1)';
+  });
+});
+
+/* ────────────────────────────────────────────────
+   BENTO GRID GSAP DIAGONAL SLIDE + PIN
+──────────────────────────────────────────────── */
+(function initBentoGSAP() {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const bentoGrid = document.getElementById('bento-grid');
+
+  // Animate bento cards staggered in
+  gsap.from('.bento-card', {
+    scrollTrigger: {
+      trigger: '#services',
+      start: 'top 75%',
+      once: true
+    },
+    opacity: 0,
+    y: 60,
+    stagger: 0.1,
+    duration: 0.9,
+    ease: 'power3.out'
+  });
+
+  // Diagonal exit — grid slides up-right as user scrolls through services
+  ScrollTrigger.create({
+    trigger: '#services',
+    start: 'bottom 80%',
+    end: 'bottom top',
+    scrub: 1.5,
+    onUpdate: (self) => {
+      const p = self.progress;
+      gsap.set(bentoGrid, {
+        x: p * window.innerWidth * 0.4,
+        y: p * -window.innerHeight * 0.4,
+        opacity: 1 - p * 0.85
+      });
+    },
+    onLeaveBack: () => {
+      gsap.to(bentoGrid, { x: 0, y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' });
+    }
+  });
+
+  // Hero entrance animations
+  gsap.to('.hero-eyebrow', { opacity: 1, y: 0, duration: 1.0, delay: 0.5, ease: 'power3.out' });
+  gsap.to('.hero-title',   { opacity: 1, y: 0, duration: 1.2, delay: 0.75, ease: 'power3.out' });
+  gsap.to('.hero-subtitle',{ opacity: 1, y: 0, duration: 1.0, delay: 1.0, ease: 'power3.out' });
+  gsap.to('.hero-scroll-hint', { opacity: 1, duration: 0.8, delay: 1.6, ease: 'power2.out' });
+
+})();
+
+/* ────────────────────────────────────────────────
+   SPECIALIST CARDS — HOVER LIFT
+──────────────────────────────────────────────── */
+document.querySelectorAll('.specialist-card').forEach(card => {
+  card.addEventListener('mouseenter', () => {
+    card.style.transform = 'translateY(-6px)';
+    card.style.transition = 'transform 0.4s ease, border-color 0.4s ease';
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'translateY(0)';
+  });
+});
+
+/* ────────────────────────────────────────────────
+   SMOOTH INTERNAL LINK SCROLL
+──────────────────────────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+/* ────────────────────────────────────────────────
+   FOOTER SOCIAL LINKS — stop propagation only
+──────────────────────────────────────────────── */
+document.querySelectorAll('.social-link').forEach(link => {
+  link.addEventListener('click', e => { e.preventDefault(); });
+});
+
+</script>
+</body>
+</html>
